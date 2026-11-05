@@ -1,0 +1,18 @@
+# Lower bounds pinned to the major versions this repo was built and tested
+# against (LangChain 1.x). The 0.x line has incompatible APIs -- an unpinned
+# install can silently resolve there and break at import time.
+langchain-core>=1.0,<2
+langchain-community>=0.4,<1
+langchain-text-splitters>=1.0,<2
+langchain-chroma>=1.0,<2
+langchain-anthropic>=1.0,<2
+langchain-openai>=1.0,<2
+langgraph>=1.0,<2
+chromadb>=1.0,<2
+sentence-transformers>=3.0
+rank_bm25>=0.2.2
+pymupdf>=1.24
+pyyaml>=6.0
+streamlit>=1.38
+requests>=2.32
+pytest>=8.0
