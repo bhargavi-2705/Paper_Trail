@@ -1,132 +1,135 @@
-# notes-rag-kb — RAG over an ML paper knowledge base, with coverage analysis
+# PaperTrail: RAG over ML papers, with retrieval ablations and coverage analysis
 
-A retrieval-augmented QA system over a corpus of machine-learning papers, built
-**baseline-first**: every component (hybrid retrieval, reranking, the agent loop)
-has to earn its place against a measured baseline on a hand-labelled eval set.
+A retrieval-augmented QA system over 10 arXiv papers (transformers, retrieval, fine-tuning,
+optimisation) that answers with page-level citations. It was built baseline-first: every component
+had to beat the previous one on a labelled eval set, and the ones that didn't were switched off.
+This README reports what was measured, including what didn't work.
 
-The project answers three questions most RAG demos skip:
-
-1. **Does each component actually help?** → ablation table, one row per variant.
-2. **How do you evaluate without gold answers?** → hand-labelled retrieval gold
-   pages + LLM-judge faithfulness, with the judge validated against hand grades.
-3. **What is *missing* from the knowledge base?** → topic coverage analysis with a
-   calibrated gap threshold.
+**Corpus and index:** 10 papers, 245 pages, 909 chunks (1200 characters, 200 overlap).
 
 ## Results
 
-> Numbers go here after you run `python scripts/ablations.py`. Do not fill this in
-> by hand — the table is generated into `eval/results/ablations.md`.
+**Retrieval** (32 labelled questions, strict page match, one question = 3.1 points)
 
-| variant | hit@1 | hit@3 | hit@5 | recall@5 | mrr | faithfulness | latency (s) |
-|---|---|---|---|---|---|---|---|
-| dense_only | | | | | | | |
-| hybrid | | | | | | | |
-| dense_rerank | | | | | | | |
-| hybrid_rerank | | | | | | | |
-| baseline_chain | | | | | | | |
-| agent_full | | | | | | | |
+| variant | hit@1 | hit@3 | hit@5 | MRR | latency (s) |
+|---|---|---|---|---|---|
+| dense only | 0.438 | 0.688 | 0.844 | 0.590 | 0.06 |
+| dense + BM25 (RRF) | 0.406 | 0.719 | 0.750 | 0.579 | 0.07 |
+| **dense + reranker (final)** | 0.438 | **0.844** | **0.969** | **0.649** | 0.39 |
+| dense + BM25 + reranker | 0.438 | 0.812 | 0.969 | 0.645 | 0.40 |
 
-## Quickstart
+Chunk size, with BM25 + reranker on (baseline: 1200 chars)
 
-Use a virtual environment. This project pins LangChain 1.x; installing it into a
-shared environment that holds other LLM tooling (crewai, embedchain, langchain-groq)
-will produce version conflicts in both directions.
+| chunking | hit@1 | hit@3 | hit@5 | MRR |
+|---|---|---|---|---|
+| 600 chars | 0.469 | 0.688 | 0.875 | 0.618 |
+| 1200 chars (baseline) | 0.438 | 0.812 | 0.969 | 0.645 |
+| 2000 chars | 0.438 | 0.750 | 0.844 | 0.615 |
+| one chunk per page | 0.531 | 0.812 | 0.906 | 0.687 |
 
-```bash
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt    # or requirements.lock.txt for exact versions
+- **The reranker is the one clear win:** hit@3 0.69 to 0.84 and hit@5 0.84 to 0.97, for about 0.3 s extra per query.
+- **BM25 added nothing once a reranker was on**, and slightly hurt without one, so it is switched off.
+  Most questions are paraphrased concepts, which is where lexical search is weakest.
+- **The reranker did not move hit@1** (0.438 either way): it gets the right page into the top 3 to 5
+  but doesn't reliably put it first.
+- **Chunking is a trade-off, not a win.** One chunk per page has the best hit@1 and MRR but lower
+  hit@5 than 1200-char chunks. Gaps of one or two questions are noise at this sample size.
 
-python scripts/fetch_corpus.py      # downloads 10 arXiv PDFs into data/raw/
-python -m src.build_index           # chunk -> embed -> Chroma (first run downloads bge-small)
+**Generation** (gpt-oss-20b via Groq, 32 questions, the same model writes and judges)
 
-export ANTHROPIC_API_KEY=...        # or set llm.provider: openai in config.yaml
-python -m src.answer "what problem does LoRA solve?"
+- LLM-judged faithfulness: **0.915 mean**. 26 of 32 answers scored 1.0, and the lowest was 0.0.
+- Mean answer latency: 2.3 s.
+- The judge has **not** been validated against human grades (see Limitations).
 
-streamlit run app.py                # demo UI
-```
+**Coverage analysis** (does the corpus cover a topic?)
 
-Then the evaluation loop:
+- A first version failed its own test: AUC 0.40 on 6 labelled topics, and its 0.83 "accuracy" equalled
+  the guess-everything-present baseline.
+- After rewriting topic queries as natural-language phrases, **AUC 1.00 on 21 labelled topics**
+  (15 known-present, 6 known-absent controls). The highest absent topic scored -3.7 and the lowest
+  present topic 0.02.
+- Only one real syllabus topic is flagged as thin (`evaluation-metrics`).
 
-```bash
-python scripts/label_eval.py        # label gold pages for the 32 hand-written questions
-python scripts/run_eval.py          # retrieval metrics, no API calls
-python scripts/run_eval.py --generation   # + answers + faithfulness
-python scripts/ablations.py         # full comparison table
-python scripts/run_coverage.py      # topic gaps
-python scripts/run_quiz.py --adaptive
-pytest                              # 22 tests, no network needed
-```
-
-## Corpus
-
-Ten typed (LaTeX-generated) arXiv papers covering transformers, retrieval,
-fine-tuning, optimisation and in-context learning — see `corpus.yaml`. They are
-fetched at run time and **never committed**; no handwritten or scanned material,
-so no OCR path is needed.
+Every experiment, including the failures, is written up in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 ## Pipeline
 
 ```
-PDF (page-level)  ->  chunk (page-bounded)  ->  bge-small embeddings  ->  Chroma
-                                                                            |
-query ->  dense top-20  +  BM25 top-20  ->  RRF fusion  ->  CrossEncoder rerank -> top-5
-                                                                            |
-                             baseline chain  OR  LangGraph agent  ->  cited answer
-                             (decompose -> retrieve -> critic -> re-query -> synthesize)
+PDF (page level) -> chunk (stays inside a page) -> bge-small embeddings -> Chroma
+query -> dense top-20 -> CrossEncoder rerank -> top-5 -> cited answer (page-level sources)
 ```
 
-Every stage is a flag in `config.yaml`, which is what makes the ablations possible.
+Every stage is a flag in `config.yaml`, which is how the ablations run. Also in the repo and
+**not evaluated or exercised in the reported results**: a LangGraph agent loop (`src/agent.py`,
+unit-tested with a fake LLM, off by default), a quiz generator, and a Streamlit demo (`app.py`).
+
+## Quickstart
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt            # or requirements.lock.txt for exact versions
+
+python scripts/fetch_corpus.py             # downloads the 10 PDFs from arXiv (not committed)
+python -m src.build_index                  # chunk, embed, store (first run downloads bge-small)
+
+export OPENAI_API_KEY=...                  # any OpenAI-compatible provider (see below)
+python -m src.answer "Why does LoRA add no inference latency?"
+```
+
+**LLM used for the reported results** (`config.yaml`, free tier on Groq):
+
+```yaml
+llm:
+  provider: openai
+  model: openai/gpt-oss-20b
+  base_url: https://api.groq.com/openai/v1
+  max_tokens: 2000
+  temperature: 0
+  reasoning_effort: low
+```
+
+Evaluation:
+
+```bash
+python scripts/label_eval.py               # assign gold pages to eval/questions.jsonl
+python scripts/run_eval.py                 # retrieval metrics, no API calls
+python scripts/ablations.py                # retrieval ablation table (~15 min)
+python -m src.build_index                  # re-run afterwards: ablations leave the index in the last chunking mode
+python scripts/run_eval.py --generation --pause 10 --tag baseline_gen   # answers + faithfulness
+python scripts/run_coverage.py             # topic coverage
+pytest                                     # unit tests, no network needed
+```
 
 ## Evaluation design
 
-**Retrieval** is scored against hand-labelled gold pages: `hit@k`, `recall@k`,
-`precision@5`, `MRR` (`src/metrics.py`, plain Python, unit-tested). Chunks are
-page-bounded, so a gold label is a page number. `--page-tol` allows a ±1 page
-match because a chunk at a page boundary can legitimately answer a question
-labelled on the neighbouring page.
-
-Two question splits, reported separately:
-
-- **human** (`eval/questions.jsonl`) — 32 questions written by hand, gold pages
-  assigned via `scripts/label_eval.py`. These are the headline numbers.
-- **synthetic** (`scripts/generate_eval.py`) — questions generated *from* a chunk,
-  so the gold page is known by construction. Useful for volume, but **optimistic**:
-  a question written from a passage shares that passage's vocabulary. Never
-  reported alone.
-
-**Generation** is scored with LLM-judge faithfulness (share of answer claims
-supported by the retrieved excerpts) — no gold answers required, which is what
-makes it usable on a self-built corpus. The judge is then checked against hand
-grades with `validate_judge()`, which reports raw agreement **and Cohen's kappa**.
-Report those next to any faithfulness number.
-
-**Coverage** probes each syllabus topic and flags thin ones. The threshold is
-calibrated against topics known to be present and one seeded topic known to be
-absent (`reinforcement-learning`), and the calibration accuracy is reported with
-the result.
+- **Retrieval:** hit@k, recall@k, precision@5 and MRR against gold pages (`src/metrics.py`, plain
+  Python, unit-tested). Matching is strict: the chunk must come from the labelled page. An earlier
+  run allowed a neighbouring page and reported hit@5 = 1.000, which hid real misses.
+- **Faithfulness:** an LLM judge splits each answer into claims and checks each against the retrieved
+  excerpts. No gold answers are needed. It measures grounding, not truth.
+- **Coverage:** score-based gap detection, tested against topics with known status.
 
 ## Limitations
 
-- The eval set is small (32 hand-written questions). Differences of a few points
-  between variants are inside the noise; only large gaps are meaningful.
-- Judge validation rests on a few dozen hand grades, so agreement and kappa have
-  wide error bars.
-- Gold pages are single-annotator (mine). No inter-annotator agreement.
-- Page-bounded chunks guarantee exact citations but can split an idea that runs
-  across a page break. The `per_page` and chunk-size ablations measure the cost.
-- Coverage gaps are detected by retrieval score, which reflects *vocabulary*
-  overlap as much as conceptual coverage. The LLM check (`--llm`) is a partial
-  mitigation, not a fix.
-- Faithfulness measures grounding in retrieved text, not truth. A confidently
-  wrong passage produces a faithful, wrong answer.
+- **32 questions, one annotator.** One question moves a metric by 3.1 points, so only large gaps
+  (the reranker) are meaningful.
+- **Labels were LLM-assisted.** Questions and gold pages were created with LLM assistance, with gold
+  pages chosen from the retriever's own top-8 candidates, and have not been independently re-verified.
+  That favours the pipeline that produced the candidates over the dense-only baseline.
+- **The faithfulness judge is unvalidated and judges its own output.** The same model writes and
+  scores the answers, which tends to inflate scores. Faithfulness is groundedness, not correctness.
+- **Page-bounded chunks can split an idea across a page break.** Question h010 missed for exactly this
+  reason: the answer sentence runs from page 3 onto page 4, so neither chunk holds it.
+- **Coverage is a small test.** The threshold was fitted and scored on the same 21 topics, and the
+  queries were rewritten after the first attempt failed. The five newer control topics are the fairer test.
+- **Free-tier LLM limits** (200K tokens/day) capped how much generation evaluation was run.
 
 ## Layout
 
 ```
-src/     ingest chunk embed vectorstore retrieve answer agent metrics judge coverage quiz
-scripts/ fetch_corpus build_index run_eval ablations generate_eval label_eval run_coverage run_quiz
-eval/    questions.jsonl + results/
-tests/   22 unit tests (metrics, chunking, RRF, judge, calibration, agent graph)
-docs/    DECISIONS.md — one entry per experiment, with numbers
+src/      ingest chunk embed vectorstore retrieve answer agent metrics judge coverage quiz llm
+scripts/  fetch_corpus build_index run_eval ablations label_eval run_coverage grade_faithfulness compare_runs
+eval/     questions.jsonl, results/
+tests/    unit tests (metrics, chunking, RRF, judge parsing, coverage, agent graph)
+docs/     DECISIONS.md, INTERVIEW_NOTES.md
 ```
