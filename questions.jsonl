@@ -1,0 +1,32 @@
+{"id": "h001", "question": "Why does scaled dot-product attention divide by the square root of the key dimension?", "type": "conceptual", "gold_doc": "attention_is_all_you_need.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h002", "question": "What problem do sinusoidal positional encodings solve in a model with no recurrence?", "type": "conceptual", "gold_doc": "attention_is_all_you_need.pdf", "gold_pages": [6], "split": "human"}
+{"id": "h003", "question": "How many attention heads and what model dimension did the base Transformer use?", "type": "factual", "gold_doc": "attention_is_all_you_need.pdf", "gold_pages": [5, 9], "split": "human"}
+{"id": "h004", "question": "Why is masking needed in the decoder's self-attention?", "type": "conceptual", "gold_doc": "attention_is_all_you_need.pdf", "gold_pages": [3], "split": "human"}
+{"id": "h005", "question": "What are the two pre-training objectives used to train BERT?", "type": "factual", "gold_doc": "bert.pdf", "gold_pages": [2], "split": "human"}
+{"id": "h006", "question": "Why does bidirectional conditioning make standard left-to-right language modelling unusable for BERT?", "type": "conceptual", "gold_doc": "bert.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h007", "question": "What percentage of tokens does BERT mask, and how are the masked positions handled during training?", "type": "factual", "gold_doc": "bert.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h008", "question": "What is the difference between the parametric and non-parametric memory in a retrieval-augmented model?", "type": "conceptual", "gold_doc": "rag.pdf", "gold_pages": [1], "split": "human"}
+{"id": "h009", "question": "How do RAG-Sequence and RAG-Token differ in how they use retrieved documents?", "type": "conceptual", "gold_doc": "rag.pdf", "gold_pages": [3], "split": "human"}
+{"id": "h010", "question": "Which components are kept frozen when training a retrieval-augmented generator, and why?", "type": "conceptual", "gold_doc": "rag.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h011", "question": "How does a dual-encoder retriever compute relevance between a question and a passage?", "type": "conceptual", "gold_doc": "dpr.pdf", "gold_pages": [3], "split": "human"}
+{"id": "h012", "question": "What are in-batch negatives and why do they make retriever training more efficient?", "type": "conceptual", "gold_doc": "dpr.pdf", "gold_pages": [3, 4], "split": "human"}
+{"id": "h013", "question": "In what situations does a sparse lexical retriever still beat a dense retriever?", "type": "conceptual", "gold_doc": "dpr.pdf", "gold_pages": [6, 12], "split": "human"}
+{"id": "h014", "question": "What is the hypothesis about intrinsic rank that motivates low-rank adaptation?", "type": "conceptual", "gold_doc": "lora.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h015", "question": "Why does low-rank adaptation add no extra inference latency once deployed?", "type": "conceptual", "gold_doc": "lora.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h016", "question": "How are the two low-rank matrices initialised at the start of adaptation, and why that way?", "type": "factual", "gold_doc": "lora.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h017", "question": "Which weight matrices in a transformer were found most worth adapting under a fixed parameter budget?", "type": "factual", "gold_doc": "lora.pdf", "gold_pages": [10], "split": "human"}
+{"id": "h018", "question": "At roughly what model scale does chain-of-thought prompting start to help rather than hurt?", "type": "factual", "gold_doc": "chain_of_thought.pdf", "gold_pages": [8, 16], "split": "human"}
+{"id": "h019", "question": "What does it mean for a prompting ability to be emergent with scale?", "type": "conceptual", "gold_doc": "chain_of_thought.pdf", "gold_pages": [4, 16], "split": "human"}
+{"id": "h020", "question": "What do the first and second moment estimates in Adam represent?", "type": "conceptual", "gold_doc": "adam.pdf", "gold_pages": [2], "split": "human"}
+{"id": "h021", "question": "Why is bias correction necessary in Adam's moment estimates?", "type": "conceptual", "gold_doc": "adam.pdf", "gold_pages": [2, 3], "split": "human"}
+{"id": "h022", "question": "What are the default values recommended for the beta parameters and epsilon in Adam?", "type": "factual", "gold_doc": "adam.pdf", "gold_pages": [2], "split": "human"}
+{"id": "h023", "question": "What is internal covariate shift and how does normalising activations address it?", "type": "conceptual", "gold_doc": "batchnorm.pdf", "gold_pages": [1, 4], "split": "human"}
+{"id": "h024", "question": "Why do the learnable scale and shift parameters exist in batch normalisation?", "type": "conceptual", "gold_doc": "batchnorm.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h025", "question": "How does batch normalisation behave differently at inference time than during training?", "type": "conceptual", "gold_doc": "batchnorm.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h026", "question": "What is the degradation problem that motivated residual connections?", "type": "conceptual", "gold_doc": "resnet.pdf", "gold_pages": [3, 5], "split": "human"}
+{"id": "h027", "question": "Why is learning a residual mapping easier than learning the underlying mapping directly?", "type": "conceptual", "gold_doc": "resnet.pdf", "gold_pages": [3], "split": "human"}
+{"id": "h028", "question": "How are shortcut connections handled when input and output dimensions differ?", "type": "factual", "gold_doc": "resnet.pdf", "gold_pages": [4], "split": "human"}
+{"id": "h029", "question": "What distinguishes zero-shot, one-shot and few-shot settings in in-context learning?", "type": "conceptual", "gold_doc": "gpt3.pdf", "gold_pages": [5, 7], "split": "human"}
+{"id": "h030", "question": "Why is in-context learning described as happening without any gradient updates?", "type": "conceptual", "gold_doc": "gpt3.pdf", "gold_pages": [3], "split": "human"}
+{"id": "h031", "question": "What contamination problem arises when evaluating a model trained on a web-scale corpus?", "type": "conceptual", "gold_doc": "gpt3.pdf", "gold_pages": [6, 9], "split": "human"}
+{"id": "h032", "question": "How does multi-head attention differ from performing attention once with full dimensionality?", "type": "conceptual", "gold_doc": "attention_is_all_you_need.pdf", "gold_pages": [4, 5], "split": "human"}

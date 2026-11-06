@@ -1,0 +1,105 @@
+# Corpus manifest. Papers are fetched at run time, never committed to the repo
+# (see .gitignore). All sources are freely downloadable typed PDFs from arXiv.
+# Topic labels drive the coverage analysis in src/coverage.py.
+papers:
+  - id: "1706.03762"
+    file: attention_is_all_you_need.pdf
+    title: "Attention Is All You Need"
+    topics: [transformers, attention, positional-encoding, encoder-decoder]
+  - id: "1810.04805"
+    file: bert.pdf
+    title: "BERT: Pre-training of Deep Bidirectional Transformers"
+    topics: [transformers, pretraining, masked-language-modelling, fine-tuning]
+  - id: "2005.11401"
+    file: rag.pdf
+    title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"
+    topics: [retrieval, rag, dense-retrieval, generation]
+  - id: "2004.04906"
+    file: dpr.pdf
+    title: "Dense Passage Retrieval for Open-Domain QA"
+    topics: [retrieval, dense-retrieval, negatives, bm25]
+  - id: "2106.09685"
+    file: lora.pdf
+    title: "LoRA: Low-Rank Adaptation of Large Language Models"
+    topics: [fine-tuning, peft, low-rank, adaptation]
+  - id: "2201.11903"
+    file: chain_of_thought.pdf
+    title: "Chain-of-Thought Prompting Elicits Reasoning in LLMs"
+    topics: [prompting, reasoning, in-context-learning]
+  - id: "1412.6980"
+    file: adam.pdf
+    title: "Adam: A Method for Stochastic Optimization"
+    topics: [optimization, adaptive-learning-rates, sgd]
+  - id: "1502.03167"
+    file: batchnorm.pdf
+    title: "Batch Normalization"
+    topics: [normalization, training-stability, regularization]
+  - id: "1512.03385"
+    file: resnet.pdf
+    title: "Deep Residual Learning for Image Recognition"
+    topics: [cnn, residual-connections, depth]
+  - id: "2005.14165"
+    file: gpt3.pdf
+    title: "Language Models are Few-Shot Learners"
+    topics: [in-context-learning, scaling, few-shot]
+
+# Topics the knowledge base is *supposed* to cover.
+syllabus:
+  - transformers
+  - attention
+  - positional-encoding
+  - pretraining
+  - fine-tuning
+  - peft
+  - retrieval
+  - dense-retrieval
+  - rag
+  - prompting
+  - reasoning
+  - in-context-learning
+  - optimization
+  - normalization
+  - regularization
+  - residual-connections
+  - scaling
+  - evaluation-metrics          # unlabelled on purpose: genuinely thin
+  - reinforcement-learning      # control: only passing mentions
+  - graph-neural-networks       # control
+  - generative-adversarial-networks   # control
+  - speech-recognition          # control
+  - recommender-systems         # control
+  - time-series-forecasting     # control
+
+# Natural-language queries. Bare slugs and acronyms ('peft') retrieve badly.
+topic_queries:
+  transformers: "the Transformer neural network architecture"
+  attention: "attention mechanism in neural networks"
+  positional-encoding: "positional encodings for sequence order in transformers"
+  pretraining: "pre-training language models on unlabelled text"
+  fine-tuning: "fine-tuning a pre-trained model on a downstream task"
+  peft: "parameter-efficient fine-tuning of large language models"
+  retrieval: "retrieving relevant passages for a query"
+  dense-retrieval: "dense vector retrieval with learned embeddings"
+  rag: "retrieval-augmented generation"
+  prompting: "prompting language models with examples"
+  reasoning: "step-by-step reasoning in language models"
+  in-context-learning: "in-context learning from a few examples without gradient updates"
+  optimization: "stochastic gradient optimization algorithms"
+  normalization: "normalizing layer activations during training"
+  regularization: "regularization to reduce overfitting"
+  residual-connections: "residual connections in very deep networks"
+  scaling: "scaling model size and its effect on performance"
+  evaluation-metrics: "evaluation metrics for model quality"
+  reinforcement-learning: "reinforcement learning with rewards and policies"
+  graph-neural-networks: "graph neural networks on graph-structured data"
+  generative-adversarial-networks: "generative adversarial networks with a generator and discriminator"
+  speech-recognition: "automatic speech recognition from audio"
+  recommender-systems: "recommender systems for user preferences"
+  time-series-forecasting: "time series forecasting"
+
+# What YOU know about this corpus. These test whether the detector works at all.
+known_present: [transformers, attention, positional-encoding, pretraining, fine-tuning, peft,
+                retrieval, dense-retrieval, rag, prompting, reasoning, in-context-learning,
+                optimization, normalization, residual-connections]
+known_absent: [reinforcement-learning, graph-neural-networks, generative-adversarial-networks,
+               speech-recognition, recommender-systems, time-series-forecasting]

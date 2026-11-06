@@ -1,0 +1,143 @@
+{
+  "tag": "smoke_gen",
+  "config": {
+    "retrieval": {
+      "top_k": 5,
+      "candidate_k": 20,
+      "hybrid": false,
+      "rrf_k": 60,
+      "rerank": true,
+      "rerank_model": "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    },
+    "chunking": {
+      "strategy": "fixed",
+      "chunk_chars": 1200,
+      "overlap_chars": 200,
+      "min_chars": 80
+    },
+    "agent": {
+      "enabled": false,
+      "decompose": true,
+      "critic": true,
+      "max_requeries": 1,
+      "max_subquestions": 3
+    },
+    "embedding": {
+      "model": "BAAI/bge-small-en-v1.5",
+      "query_prefix": "Represent this sentence for searching relevant passages: "
+    }
+  },
+  "summary": {
+    "hit@1": 0.6,
+    "recall@1": 0.6,
+    "hit@3": 1.0,
+    "recall@3": 1.0,
+    "hit@5": 1.0,
+    "recall@5": 1.0,
+    "hit@10": 1.0,
+    "recall@10": 1.0,
+    "precision@5": 0.4,
+    "mrr": 0.8,
+    "n": 5,
+    "retrieval_latency_s_mean": 2.7551147836260497,
+    "faithfulness_mean": 1.0,
+    "answer_latency_s_mean": 39.88983657499775
+  },
+  "per_question": [
+    {
+      "mrr": 1.0,
+      "precision@5": 0.6,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h001",
+      "question": "Why does scaled dot-product attention divide by the square root of the key dimension?",
+      "split": "human",
+      "answer_latency_s": 36.409849708899856,
+      "faithfulness": 1.0,
+      "n_claims": 5,
+      "answer": "Scaled dot-product attention divides the dot products by the square root of the key dimension ($\\sqrt{d_k}$) to counteract the effect of the dot products growing extremely large in magnitude for large values of $d_k$ [3]. \n\nWhen the dot products grow very large, it pushes the softmax function into regions where it has extremely small gradients [3]. This occurs because if the components of the query ($q$) and key ($k$) are independent random variables with a mean of 0 and a variance of 1, their dot product has a mean of 0 and a variance of $d_k$ [2]. Scaling the dot products by $\\frac{1}{\\sqrt{d_k}}$ prevents this issue [3]."
+    },
+    {
+      "mrr": 1.0,
+      "precision@5": 0.4,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h002",
+      "question": "What problem do sinusoidal positional encodings solve in a model with no recurrence?",
+      "split": "human",
+      "answer_latency_s": 13.141448915936053,
+      "faithfulness": null,
+      "n_claims": 0,
+      "answer": "In a model with no recurrence (and no convolution), there is no inherent way for the model to make use of the order of the sequence [1]. \n\nTo solve this, positional encodings inject information about the relative or absolute position of the tokens in the sequence [1]. Specifically, the sinusoidal positional encodings address these needs by:\n* Allowing the model to make use of the sequence order [1].\n* Allowing the model to easily learn to attend by relative positions, because for any fixed offset $k$, $PE_{pos+k}$ can be represented as a linear function of $PE_{pos}$ [2].\n* Allowing the model to potentially extrapolate to sequence lengths longer than the ones encountered during training [2]."
+    },
+    {
+      "mrr": 0.5,
+      "precision@5": 0.4,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h003",
+      "question": "How many attention heads and what model dimension did the base Transformer use?",
+      "split": "human",
+      "answer_latency_s": 25.807357999961823,
+      "faithfulness": 1.0,
+      "n_claims": 2,
+      "answer": "Based on the provided excerpts, the base Transformer used:\n\n* **8** attention heads ($h = 8$) [2, 3].\n* A model dimension ($d_{model}$) of **512** [2, 5]."
+    },
+    {
+      "mrr": 1.0,
+      "precision@5": 0.2,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h004",
+      "question": "Why is masking needed in the decoder's self-attention?",
+      "split": "human",
+      "answer_latency_s": 50.6224550830666,
+      "faithfulness": 1.0,
+      "n_claims": 4,
+      "answer": "Masking is needed in the decoder's self-attention for the following reasons:\n\n* **To prevent positions from attending to subsequent positions:** This ensures that the predictions for a given position $i$ can depend only on the known outputs at positions less than $i$ [1].\n* **To preserve the auto-regressive property:** It prevents leftward information flow in the decoder by masking out (setting to $-\\infty$) all values in the input of the softmax that correspond to illegal connections [2]."
+    },
+    {
+      "mrr": 0.5,
+      "precision@5": 0.4,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h005",
+      "question": "What are the two pre-training objectives used to train BERT?",
+      "split": "human",
+      "answer_latency_s": 73.46807116712444,
+      "faithfulness": 1.0,
+      "n_claims": 4,
+      "answer": "Based on the provided excerpts, the two pre-training objectives used to train BERT are:\n\n1. **Masked Language Model (MLM)**: An objective that enables the representation to fuse both left and right context [4].\n2. **Next Sentence Prediction (NSP)**: A task that jointly pre-trains text-pair representations [4]."
+    }
+  ]
+}

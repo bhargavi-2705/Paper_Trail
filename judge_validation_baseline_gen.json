@@ -1,0 +1,18 @@
+{
+  "h006": {
+    "judge_score": 0.5,
+    "human_label": 0
+  },
+  "h019": {
+    "judge_score": 1.0,
+    "human_label": 1
+  },
+  "h009": {
+    "judge_score": 1.0,
+    "human_label": 1
+  },
+  "h025": {
+    "judge_score": 1.0,
+    "human_label": 0
+  }
+}

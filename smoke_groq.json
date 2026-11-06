@@ -1,0 +1,152 @@
+{
+  "tag": "smoke_groq",
+  "config": {
+    "retrieval": {
+      "top_k": 5,
+      "candidate_k": 20,
+      "hybrid": false,
+      "rrf_k": 60,
+      "rerank": true,
+      "rerank_model": "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    },
+    "chunking": {
+      "strategy": "fixed",
+      "chunk_chars": 1200,
+      "overlap_chars": 200,
+      "min_chars": 80
+    },
+    "agent": {
+      "enabled": false,
+      "decompose": true,
+      "critic": true,
+      "max_requeries": 1,
+      "max_subquestions": 3
+    },
+    "embedding": {
+      "model": "BAAI/bge-small-en-v1.5",
+      "query_prefix": "Represent this sentence for searching relevant passages: "
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "openai/gpt-oss-20b",
+      "max_tokens": 2000,
+      "temperature": 0,
+      "reasoning_effort": "low"
+    }
+  },
+  "summary": {
+    "hit@1": 0.6,
+    "recall@1": 0.6,
+    "hit@3": 1.0,
+    "recall@3": 1.0,
+    "hit@5": 1.0,
+    "recall@5": 1.0,
+    "hit@10": 1.0,
+    "recall@10": 1.0,
+    "precision@5": 0.4,
+    "mrr": 0.8,
+    "n": 5,
+    "n_requested": 5,
+    "retrieval_latency_s_mean": 1.9633728250861169,
+    "faithfulness_mean": 1.0,
+    "faithfulness_n_scored": 4,
+    "answer_latency_s_mean": 1.0304320166353136
+  },
+  "per_question": [
+    {
+      "mrr": 1.0,
+      "precision@5": 0.6,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h001",
+      "question": "Why does scaled dot-product attention divide by the square root of the key dimension?",
+      "split": "human",
+      "answer_latency_s": 1.190823124954477,
+      "faithfulness": null,
+      "n_claims": 0,
+      "answer": "The division by the square root of the key dimension, \\( \\sqrt{d_k} \\), is introduced to counteract the tendency of the raw dot products to grow large as the dimensionality of the keys increases. When the components of the query and key vectors are independent random variables with mean\u202f0 and variance\u202f1, their dot product has variance equal to the key dimension \\(d_k\\). Consequently, for larger \\(d_k\\) the dot products become larger in magnitude, pushing the softmax function into regions where its gradients become extremely small. Scaling the dot products by \\(1/\\sqrt{d_k}\\) keeps their scale roughly constant regardless of \\(d_k\\), which stabilises the softmax and preserves useful gradients during training.  \n\n[3]"
+    },
+    {
+      "mrr": 1.0,
+      "precision@5": 0.4,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h002",
+      "question": "What problem do sinusoidal positional encodings solve in a model with no recurrence?",
+      "split": "human",
+      "answer_latency_s": 0.9768102921079844,
+      "faithfulness": 1.0,
+      "n_claims": 3,
+      "answer": "The sinusoidal positional encodings provide the model with information about the order of the tokens in the sequence. Because the Transformer has no recurrence or convolution to impose a notion of position, adding these encodings to the input embeddings allows the model to use relative or absolute positional information when computing self\u2011attention. This solves the problem of the model lacking any inherent sense of token order. [1] [2]"
+    },
+    {
+      "mrr": 0.5,
+      "precision@5": 0.4,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h003",
+      "question": "How many attention heads and what model dimension did the base Transformer use?",
+      "split": "human",
+      "answer_latency_s": 0.8583882909733802,
+      "faithfulness": 1.0,
+      "n_claims": 2,
+      "answer": "The base Transformer used **8 attention heads** and a **model dimension of 512** [3][5]."
+    },
+    {
+      "mrr": 1.0,
+      "precision@5": 0.2,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h004",
+      "question": "Why is masking needed in the decoder's self-attention?",
+      "split": "human",
+      "answer_latency_s": 1.3242713750805706,
+      "faithfulness": 1.0,
+      "n_claims": 3,
+      "answer": "Masking is required so that each position in the decoder can only attend to positions that come before it (or to the encoder output), preventing the model from \u201clooking ahead\u201d at future tokens. This preserves the auto\u2011regressive property of the decoder, ensuring that the prediction for position *i* depends only on the known outputs at positions less than *i*\u30101\u3011. The masking is implemented by setting the attention scores for illegal connections to \\(-\\infty\\) before the softmax, effectively blocking any influence from subsequent positions\u30102\u3011."
+    },
+    {
+      "mrr": 0.5,
+      "precision@5": 0.4,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@10": 1.0,
+      "recall@10": 1.0,
+      "id": "h005",
+      "question": "What are the two pre-training objectives used to train BERT?",
+      "split": "human",
+      "answer_latency_s": 0.801867000060156,
+      "faithfulness": 1.0,
+      "n_claims": 3,
+      "answer": "The two pre\u2011training objectives used to train BERT are:\n\n1. **Masked Language Model (MLM)** \u2013 a task that masks a portion of the input tokens and trains the model to predict the original tokens from the surrounding context.  \n2. **Next Sentence Prediction (NSP)** \u2013 a task that trains the model to predict whether a given pair of sentences appears consecutively in the original text.\n\nThese objectives are described in the BERT paper\u2019s discussion of pre\u2011training tasks [4]."
+    }
+  ]
+}
